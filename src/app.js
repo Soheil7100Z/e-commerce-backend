@@ -5,6 +5,7 @@ import cors from 'cors';
 import { initDB } from './config/initDB.js';
 import { errorHandler } from './middleware/error.middleware.js';
 
+import userRoutes from './routes/user.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -31,8 +32,8 @@ app.get('/', async (req, res) => {
   }
 });
 
+app.use('/', userRoutes);
 
-app.use(errorHandler)
-
+app.use(errorHandler);
 
 export default app;
