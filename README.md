@@ -5,6 +5,8 @@ Backend of an Ecommerce project built with **Node.js**.
 ## Tech Stack
 - Node.js
 - Express
+- MySQL
+- JWT Authentication
 - REST API
 
 ## Status
@@ -15,6 +17,15 @@ The Frontend is built with React and runs in a separate repository [e-commerce-f
 
 ## Database Configuration (MySQL)
 Before running the backend, configure your MySQL database credentials (username and password).
+
+## Environment Variables
+
+Before running the backend, create a `.env` file in the root directory and configure the following variables:
+
+```env
+DB_PASS=your_mysql_password
+JWT_SECRET=your_jwt_secret
+```
 
 ## 🚀 Run Locally
 
