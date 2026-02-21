@@ -15,3 +15,10 @@ export const loginRepository = async ({ email }) => {
 
   return result[0];
 };
+
+export const profileRepository = async (user_id) => {
+  const findUserByid = 'SELECT firstName, lastName, email FROM users WHERE id = ?';
+  const [result] = await db.query(findUserByid, [user_id]);
+
+  return result;
+};
