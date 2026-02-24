@@ -6,7 +6,7 @@ dotenv.config();
 export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader) return res.status(401).json({ message: 'No token!' });
+  if (!authHeader) return res.status(401).json({ message: 'kein token!' });
 
   const token = authHeader.split(' ')[1];
 
@@ -15,6 +15,6 @@ export const authMiddleware = (req, res, next) => {
     req.user = decoded;
     next();
   } catch {
-    return res.status(401).json({ message: 'Invalid or expired token!' });
+    return res.status(401).json({ message: 'Ungültiges oder abgelaufenes Token!' });
   }
 };

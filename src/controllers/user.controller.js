@@ -2,7 +2,7 @@ import { registerService, loginService, profileService } from '../services/user.
 
 export const registerController = async (req, res, next) => {
   try {
-    const userId = await registerService(req.body);
+    const userId = await registerService({ userData: req.body });
 
     res.status(201).json({
       message: 'Registrierung ist erfolgreich!',
@@ -15,7 +15,7 @@ export const registerController = async (req, res, next) => {
 
 export const loginController = async (req, res, next) => {
   try {
-    const userToken = await loginService(req.body);
+    const userToken = await loginService({ userData: req.body });
 
     res.status(200).json({
       message: 'Anmeldung ist erfolgreich!',
@@ -28,7 +28,7 @@ export const loginController = async (req, res, next) => {
 
 export const profileController = async (req, res, next) => {
   try {
-    const userData = await profileService(req.user.id);
+    const userData = await profileService({ user_id: req.user.id });
 
     res.status(200).json({
       message: 'Profil ist erfolgreich!',

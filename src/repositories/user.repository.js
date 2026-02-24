@@ -9,7 +9,7 @@ export const registerRepository = async (userData) => {
   return result.insertId;
 };
 
-export const loginRepository = async ({ email }) => {
+export const loginRepository = async ({email}) => {
   const findUserEmail = 'SELECT id, email, password FROM users WHERE email = ?';
   const [result] = await db.query(findUserEmail, [email]);
 
