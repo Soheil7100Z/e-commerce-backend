@@ -9,7 +9,7 @@ export const registerRepository = async (userData) => {
   return result.insertId;
 };
 
-export const loginRepository = async ({email}) => {
+export const loginRepository = async ({ email }) => {
   const findUserEmail = 'SELECT id, email, password FROM users WHERE email = ?';
   const [result] = await db.query(findUserEmail, [email]);
 
@@ -17,8 +17,20 @@ export const loginRepository = async ({email}) => {
 };
 
 export const profileRepository = async (user_id) => {
-  const findUserByid = 'SELECT firstName, lastName, email FROM users WHERE id = ?';
+  const findUserByid = 'SELECT * FROM users WHERE id = ?';
   const [result] = await db.query(findUserByid, [user_id]);
 
   return result;
+};
+
+export const updateProfileRepository = async ({ user_id, ...editedData }) => {
+  const fields = Object.keys(editedData);
+  const values = Object.values(editedData);
+
+  const setClause = fields.map((field) => `${field} = ?`).join(', ');
+  const updateUserData = `UPDATE users SET ${setClause} WHERE id = ?`;
+
+  const [result] = await db.query(updateUserData, [...values, user_id]);
+
+  return result.affectedRows;
 };
