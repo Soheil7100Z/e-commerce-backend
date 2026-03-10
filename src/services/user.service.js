@@ -2,8 +2,9 @@ import { AppError } from '../utils/AppError.js';
 import {
   loginRepository,
   registerRepository,
-  profileRepository,
+  getUserProfileRepository,
   updateProfileRepository,
+  createAddressRepository,
 } from '../repositories/user.repository.js';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
@@ -62,21 +63,21 @@ export const loginService = async ({ userData }) => {
   return token;
 };
 
-export const profileService = async ({ user_id }) => {
-  if (!user_id) throw new AppError('Benutzer-ID fehlt oder ist ungültig!', 401);
+export const getUserProfileService = async ({ userId }) => {
+  if (!userId) throw new AppError('Benutzer-ID fehlt oder ist ungültig!', 401);
 
-  const userData = await profileRepository(user_id);
+  const userData = await getUserProfileRepository(userId);
   if (!userData || userData.length === 0) throw new AppError('Benutzer konnte nicht gefunden werden!', 404);
 
   return userData[0];
 };
 
-export const updateProfileService = async ({ userData, user_id }) => {
+export const updateProfileService = async ({ userData, userId }) => {
   const { firstName, lastName, phone, password } = userData;
 
   if (!firstName || !lastName) throw new AppError('Vorname, Nachname sind pflicht!', 400);
 
-  const [originalUserData] = await profileRepository(user_id);
+  const [originalUserData] = await getUserProfileRepository(userId);
 
   const editedData = {};
 
@@ -103,7 +104,49 @@ export const updateProfileService = async ({ userData, user_id }) => {
 
   if (Object.keys(editedData).length === 0) throw new AppError('Es gibt kein neue Angaben zu speichern!', 400);
 
-  const affectedRowsResult = await updateProfileRepository({ user_id, ...editedData });
+  const affectedRowsResult = await updateProfileRepository({ userId, ...editedData });
 
   if (affectedRowsResult === 0) throw new AppError('Benutzer nicht gefunden!', 404);
+};
+
+export const createAddressService = async ({ userAddress, userId }) => {
+  const { deliveryAddressForm, billingAddressForm = {} } = userAddress;
+
+  if (!Object.keys(deliveryAddressForm).length) throw new AppError('Lieferadresse ist pflicht!', 400);
+
+  const { firstName, lastName, street, houseNumber, postcode, city, country } = deliveryAddressForm;
+
+  if (!firstName || !lastName || !street || !houseNumber || !postcode || !city || !country)
+    throw new AppError('Angabe der Lieferadresse sind pflicht!', 400);
+
+  const deliveryAddressValuesTrim = [
+    firstName.trim(),
+    lastName.trim(),
+    street.trim(),
+    houseNumber.trim(),
+    postcode.trim(),
+    city.trim(),
+    country.trim(),
+  ];
+
+  if (!Object.keys(billingAddressForm).length) {
+    await createAddressRepository({ deliveryAddressValuesTrim, userId });
+  } else {
+    const { firstName, lastName, street, houseNumber, postcode, city, country } = billingAddressForm;
+
+    if (!firstName || !lastName || !street || !houseNumber || !postcode || !city || !country)
+      throw new AppError('Angabe der Rechnungsadresse sind pflicht!', 400);
+
+    const billingAddressValuesTrim = [
+      firstName.trim(),
+      lastName.trim(),
+      street.trim(),
+      houseNumber.trim(),
+      postcode.trim(),
+      city.trim(),
+      country.trim(),
+    ];
+
+    await createAddressRepository({ deliveryAddressValuesTrim, billingAddressValuesTrim, userId });
+  }
 };

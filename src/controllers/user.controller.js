@@ -1,4 +1,10 @@
-import { registerService, loginService, profileService, updateProfileService } from '../services/user.service.js';
+import {
+  registerService,
+  loginService,
+  getUserProfileService,
+  updateProfileService,
+  createAddressService,
+} from '../services/user.service.js';
 
 export const registerController = async (req, res, next) => {
   try {
@@ -26,9 +32,9 @@ export const loginController = async (req, res, next) => {
   }
 };
 
-export const profileController = async (req, res, next) => {
+export const getUserProfileController = async (req, res, next) => {
   try {
-    const userData = await profileService({ user_id: req.user.id });
+    const userData = await getUserProfileService({ userId: req.user.id });
 
     res.status(200).json({
       message: 'Profil ist erfolgreich!',
@@ -41,10 +47,22 @@ export const profileController = async (req, res, next) => {
 
 export const updateProfileController = async (req, res, next) => {
   try {
-    await updateProfileService({ userData: req.body, user_id: req.user.id });
+    await updateProfileService({ userData: req.body, userId: req.user.id });
 
     res.status(200).json({
       message: 'Ihre Daten wurden gespeichert!',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createAddressController = async (req, res, next) => {
+  try {
+    await createAddressService({ userAddress: req.body, userId: req.user.id });
+
+    res.status(200).json({
+      message: 'Adresse wurde gespeichert!',
     });
   } catch (err) {
     next(err);

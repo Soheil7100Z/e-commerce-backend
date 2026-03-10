@@ -32,7 +32,7 @@ export async function initDB() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
      `);
 
-    console.log('Tabelle users and addresses erstellt ');
+    console.log('Tabelle users and addresses erstellt');
   } catch (err) {
     console.error('Fehler beim Erstellen der Tabelle:', err);
   }
