@@ -45,3 +45,10 @@ export const createAddressRepository = async ({ deliveryAddressValuesTrim, billi
 
   if (billingAddressValuesTrim.length) await db.query(insertAddress, [userId, 'billing', ...billingAddressValuesTrim]);
 };
+
+export const getUserAddressRepository = async (userId) => {
+  const findUserAddressById = 'SELECT * FROM addresses WHERE user_id = ?';
+  const [result] = await db.query(findUserAddressById, [userId]);
+
+  return result;
+};

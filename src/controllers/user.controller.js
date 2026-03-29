@@ -4,6 +4,7 @@ import {
   getUserProfileService,
   updateProfileService,
   createAddressService,
+  getUserAddressService,
 } from '../services/user.service.js';
 
 export const registerController = async (req, res, next) => {
@@ -63,6 +64,18 @@ export const createAddressController = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Adresse wurde gespeichert!',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getUserAddressController = async (req, res, next) => {
+  try {
+    const address = await getUserAddressService({ userId: req.user.id });
+
+    res.status(200).json({
+      address,
     });
   } catch (err) {
     next(err);

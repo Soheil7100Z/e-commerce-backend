@@ -5,6 +5,7 @@ import {
   getUserProfileRepository,
   updateProfileRepository,
   createAddressRepository,
+  getUserAddressRepository,
 } from '../repositories/user.repository.js';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
@@ -149,4 +150,20 @@ export const createAddressService = async ({ userAddress, userId }) => {
 
     await createAddressRepository({ deliveryAddressValuesTrim, billingAddressValuesTrim, userId });
   }
+};
+
+export const getUserAddressService = async ({ userId }) => {
+  if (!userId) throw new AppError('Benutzer-ID fehlt oder ist ungültig!', 401);
+  const addresses = await getUserAddressRepository(userId);
+
+  const userAddresses = {
+    delivery: null,
+    billing: null,
+  };
+
+  addresses.forEach((address) => {
+    userAddresses[address.type] = address;
+  });
+
+  return userAddresses;
 };
