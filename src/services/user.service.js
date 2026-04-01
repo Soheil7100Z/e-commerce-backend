@@ -4,8 +4,8 @@ import {
   registerRepository,
   getUserProfileRepository,
   updateProfileRepository,
-  createAddressRepository,
   getUserAddressRepository,
+  upsertAddressRepository,
 } from '../repositories/user.repository.js';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
@@ -74,6 +74,8 @@ export const getUserProfileService = async ({ userId }) => {
 };
 
 export const updateProfileService = async ({ userData, userId }) => {
+  if (!userId) throw new AppError('Benutzer-ID fehlt oder ist ungültig!', 401);
+
   const { firstName, lastName, phone, password } = userData;
 
   if (!firstName || !lastName) throw new AppError('Vorname, Nachname sind pflicht!', 400);
@@ -110,7 +112,9 @@ export const updateProfileService = async ({ userData, userId }) => {
   if (affectedRowsResult === 0) throw new AppError('Benutzer nicht gefunden!', 404);
 };
 
-export const createAddressService = async ({ userAddress, userId }) => {
+export const upsertAddressService = async ({ userAddress, userId }) => {
+  if (!userId) throw new AppError('Benutzer-ID fehlt oder ist ungültig!', 401);
+
   const { deliveryAddressForm, billingAddressForm = {} } = userAddress;
 
   if (!Object.keys(deliveryAddressForm).length) throw new AppError('Lieferadresse ist pflicht!', 400);
@@ -131,7 +135,7 @@ export const createAddressService = async ({ userAddress, userId }) => {
   ];
 
   if (!Object.keys(billingAddressForm).length) {
-    await createAddressRepository({ deliveryAddressValuesTrim, userId });
+    await upsertAddressRepository({ deliveryAddressValuesTrim, userId });
   } else {
     const { firstName, lastName, street, houseNumber, postcode, city, country } = billingAddressForm;
 
@@ -148,7 +152,7 @@ export const createAddressService = async ({ userAddress, userId }) => {
       country.trim(),
     ];
 
-    await createAddressRepository({ deliveryAddressValuesTrim, billingAddressValuesTrim, userId });
+    await upsertAddressRepository({ deliveryAddressValuesTrim, billingAddressValuesTrim, userId });
   }
 };
 

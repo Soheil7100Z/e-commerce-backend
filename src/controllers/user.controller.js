@@ -3,8 +3,8 @@ import {
   loginService,
   getUserProfileService,
   updateProfileService,
-  createAddressService,
   getUserAddressService,
+  upsertAddressService,
 } from '../services/user.service.js';
 
 export const registerController = async (req, res, next) => {
@@ -58,9 +58,9 @@ export const updateProfileController = async (req, res, next) => {
   }
 };
 
-export const createAddressController = async (req, res, next) => {
+export const upsertAddressController = async (req, res, next) => {
   try {
-    await createAddressService({ userAddress: req.body, userId: req.user.id });
+    await upsertAddressService({ userAddress: req.body, userId: req.user.id });
 
     res.status(200).json({
       message: 'Adresse wurde gespeichert!',

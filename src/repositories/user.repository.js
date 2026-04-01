@@ -35,15 +35,30 @@ export const updateProfileRepository = async ({ userId, ...editedData }) => {
   return result.affectedRows;
 };
 
-export const createAddressRepository = async ({ deliveryAddressValuesTrim, billingAddressValuesTrim = [], userId }) => {
-  const insertAddress = `
+export const upsertAddressRepository = async ({ deliveryAddressValuesTrim, billingAddressValuesTrim = [], userId }) => {
+  const upsertAddress = `
   INSERT INTO addresses
   (user_id, type, firstName, lastName, street, houseNumber, postcode, city, country)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON DUPLICATE KEY UPDATE
+    firstName = VALUES(firstName),
+    lastName = VALUES(lastName),
+    street = VALUES(street),
+    houseNumber = VALUES(houseNumber),
+    postcode = VALUES(postcode),
+    city = VALUES(city),
+    country = VALUES(country)
+  `;
 
-  await db.query(insertAddress, [userId, 'delivery', ...deliveryAddressValuesTrim]);
+  await db.query(upsertAddress, [userId, 'delivery', ...deliveryAddressValuesTrim]);
 
-  if (billingAddressValuesTrim.length) await db.query(insertAddress, [userId, 'billing', ...billingAddressValuesTrim]);
+  if (billingAddressValuesTrim.length) {
+    await db.query(upsertAddress, [userId, 'billing', ...billingAddressValuesTrim]);
+  } else {
+    const deleteBillingAddress = 'DELETE FROM addresses WHERE user_id = ? AND type = ? LIMIT 1';
+
+    await db.query(deleteBillingAddress, [userId, 'billing']);
+  }
 };
 
 export const getUserAddressRepository = async (userId) => {
